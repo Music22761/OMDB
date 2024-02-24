@@ -78,33 +78,37 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 function HomePage() {
+
   const [searchValue, setSearchValue] = useState("");
+  const [idValue, setIdValue] = useState(0);
   const [page, setPage] = useState(0);
 
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && searchValue.length > 0) {
+    if (e.key === "Enter" && searchValue.length > 0 && idValue == 0) {
       // เรียกใช้ฟังก์ชั่นค้นหา
       console.log("ค้นหา:", searchValue);
       console.log("page handle key press " + page);
       setPage(1);
-      // btnClickName(searchValue);
       btnClickNamePage(searchValue, 1);
+    } else if (e.key === "Enter" && searchValue.length > 0 && idValue == 1) {
+      console.log("ID Search" + idValue+" "+typeof(idValue));
+      findById(searchValue);
     } else if (e.key === "Enter" && searchValue.length <= 0) {
       alert("กรุณาใส่ข้อมูลก่อนค้นหา !!!");
     }
   };
 
   const [movie, setMovie] = useState<MovieGetSearch>();
-  const navigate = useNavigate();
-  // const nameRef = useRef<HTMLInputElement>(null);
-  // let nameInput = "";
   const services = new Service();
+  
+  
 
-  function navigateTo(id:string) {
-    console.log("Log Navigate| "+id);
-    
+  const navigate = useNavigate();
+  function navigateTo(id: string) {
+    console.log("Log Navigate| " + id);
+
     navigate(`/movie?id=${id}`);
-    
   }
 
   return (
@@ -134,9 +138,27 @@ function HomePage() {
                 <SearchIcon />
               </SearchIconWrapper>
               <StyledInputBase
-                placeholder="Search…"
+                placeholder="Search By Name"
                 inputProps={{ "aria-label": "search" }}
-                onChange={(e) => setSearchValue(e.target.value)}
+                onChange={(e) => {
+                  setIdValue(0);
+                  setSearchValue(e.target.value);
+                  
+                }}
+                onKeyPress={handleKeyPress}
+              />
+            </Search>
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search By ID"
+                inputProps={{ "aria-label": "search" }}
+                onChange={(e) => {
+                  setSearchValue(e.target.value);
+                  setIdValue(1);
+                }}
                 onKeyPress={handleKeyPress}
               />
             </Search>
@@ -144,15 +166,18 @@ function HomePage() {
         </AppBar>
       </Box>
 
-      <Grid container spacing={2} justifyContent="center">
+      <Grid container spacing={2} justifyContent="center" style={{padding:'15vh'}}>
         {movie ? (
           movie.Search.map((e) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={e.imdbID}>
               <Card>
-                <CardActionArea id={e.imdbID} onClick={() => navigateTo(String(e.imdbID))}>
+                <CardActionArea
+                  id={e.imdbID}
+                  onClick={() => navigateTo(String(e.imdbID))}
+                >
                   <CardMedia
                     component="img"
-                    height="250"
+                    height="345"
                     image={e.Poster}
                     alt={e.Title}
                   />
@@ -169,12 +194,18 @@ function HomePage() {
             </Grid>
           ))
         ) : (
-          // แสดง CircularProgress ขณะโหลดข้อมูล
-          <Grid item xs={12} style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+          // CircularProgress โหลดข้อมูล
+          <Grid
+            item
+            xs={12}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
             <CircularProgress />
-            <Typography>
-              ยังไม่มีข้อมูลการค้นหา...
-            </Typography>
+            <Typography>ยังไม่มีข้อมูลการค้นหา...</Typography>
           </Grid>
         )}
       </Grid>
@@ -227,13 +258,28 @@ function HomePage() {
 
   async function btnClickNamePage(name: string, page: number) {
     const res = await services.getMovieByNamePage(name, page);
-    setMovie(res);
+    
 
     console.log(
       "Res Btn Click Name " + typeof Boolean(res.Response) + " " + res.Response
     );
-    if (res.Response === "False") {
+    if (String(res.Response) === "False") {
       console.log(res.Response);
+      alert("มีข้อมูลมากเกินไป !!! โปรดใส่ Keyword อื่นในการค้นหา!!")
+    }else{
+      setMovie(res);
+    }
+    console.log(res);
+  }
+
+  async function findById(id: string) {
+    const res = await services.getMovieById(id);
+    if (id === String(res.imdbID)) {
+      console.log(id);
+      
+      navigateTo(id);
+    }else {
+      alert("ไม่มีหนังที่มี ID : "+id+" กรุณากรอก ID ใหม่")
     }
     console.log(res);
   }
