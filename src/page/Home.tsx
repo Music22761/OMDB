@@ -1,6 +1,5 @@
 import {
   AppBar,
-  // Avatar,
   BottomNavigation,
   Box,
   Button,
@@ -12,10 +11,6 @@ import {
   Grid,
   IconButton,
   InputBase,
-  // List,
-  // ListItemAvatar,
-  // ListItemButton,
-  // ListItemText,
   Paper,
   Stack,
   Toolbar,
@@ -28,7 +23,6 @@ import { useState } from "react";
 import { MovieGetSearch } from "../model/searchModel";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
-// import ImageIcon from "@mui/icons-material/Image";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
@@ -114,7 +108,7 @@ function HomePage() {
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
-        <AppBar className="appbar" position="fixed">
+        <AppBar position="fixed">
           <Toolbar>
             <IconButton
               size="large"
@@ -215,10 +209,10 @@ function HomePage() {
           sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
           elevation={3}
         >
-          <BottomNavigation showLabels className="appbar">
+          <BottomNavigation showLabels>
             <Stack direction="row" spacing={5}>
               <Button
-                variant="outlined"
+                variant="contained"
                 onClick={() => {
                   console.log("page arrow back " + page);
                   if (page > 1) {
@@ -231,10 +225,10 @@ function HomePage() {
               </Button>
 
               <Button variant="outlined" disabled>
-                {page + "-" + Math.ceil(Number(movie?.totalResults) / 10)}
+                {pageDefult(page,Math.ceil(Number(movie?.totalResults) / 10))}
               </Button>
               <Button
-                variant="outlined"
+                variant="contained"
                 onClick={() => {
                   if (
                     page != 0 &&
@@ -258,15 +252,16 @@ function HomePage() {
 
   async function btnClickNamePage(name: string, page: number) {
     const res = await services.getMovieByNamePage(name, page);
-    
-
     console.log(
       "Res Btn Click Name " + typeof Boolean(res.Response) + " " + res.Response
     );
-    if (String(res.Response) === "False") {
+    console.log("Total REsult: "+res.totalResults);
+
+    if (String(res.Response) === "False"&& res.totalResults == undefined) {
       console.log(res.Response);
-      alert("มีข้อมูลมากเกินไป !!! โปรดใส่ Keyword อื่นในการค้นหา!!")
-    }else{
+      alert("ข้อมูลอาจจะมากเกินไป หรือ ไม่มีข้อมูลนี้ !!! โปรดใส่ Keyword อื่นในการค้นหา เช่น ( battman ) เป็นต้น")
+    }
+    else{
       setMovie(res);
     }
     console.log(res);
@@ -276,12 +271,19 @@ function HomePage() {
     const res = await services.getMovieById(id);
     if (id === String(res.imdbID)) {
       console.log(id);
-      
       navigateTo(id);
     }else {
       alert("ไม่มีหนังที่มี ID : "+id+" กรุณากรอก ID ใหม่")
     }
     console.log(res);
+  }
+
+  function pageDefult(page:number,param:number) {
+    if (param > 1) {
+      return(page+"-"+param);
+    }else{
+      return("Defult Page")
+    }
   }
 }
 

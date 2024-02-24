@@ -45,13 +45,9 @@ function MoviePage() {
       setLoading(false);
     }
   };
-
   function navigateTo() {
-    navigate(-1)
+    navigate(-1);
   }
-
-  
-
   return (
     <>
       {loading ? (
@@ -86,17 +82,21 @@ function MoviePage() {
                   color="inherit"
                   aria-label="open drawer"
                   sx={{ mr: 2 }}
-                  onClick={()=>navigateTo()}
+                  onClick={() => navigateTo()}
                 >
-                  <ArrowBackIosNewIcon/>
+                  <ArrowBackIosNewIcon />
                 </IconButton>
-
               </Toolbar>
             </AppBar>
           </Box>
 
-          <>
-            <Grid container spacing={2} justifyContent="center" style={{padding:'5%'}}>
+          <Card style={{ margin: "10%", boxShadow: "5px 5px 10px 5px" }}>
+            <Grid
+              container
+              spacing={2}
+              justifyContent="center"
+              style={{ padding: "5%" }}
+            >
               <Grid item xs={12} sm={6}>
                 <Card>
                   <CardActionArea id={movie?.imdbID}>
@@ -117,7 +117,11 @@ function MoviePage() {
                     </CardContent>
                   </CardActionArea>
                   <CardActions>
-                    <Button size="small" color="primary" href={"https://www.omdbapi.com/"}>
+                    <Button
+                      size="small"
+                      color="primary"
+                      href={"https://www.omdbapi.com/"}
+                    >
                       Visit Website
                     </Button>
                   </CardActions>
@@ -162,7 +166,7 @@ function MoviePage() {
                 </Typography>
               </Grid>
             </Grid>
-          </>
+          </Card>
         </div>
       )}
     </>
